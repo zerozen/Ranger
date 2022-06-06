@@ -1,0 +1,55 @@
+#bankdef program
+{
+    #addr 0x0100
+    #size 0x0400
+    #outp 0x0000
+}
+
+
+#subruledef math
+{
+    ADD => 0x0`3
+    SUB => 0x1`3
+    MUL => 0x2`3
+    DIV => 0x3`3
+    MOD => 0x4`3
+}
+
+#subruledef logic
+{
+    AND => 0x0`3
+    OR => 0x1`3
+    ROR => 0x4`3
+    SLL => 0x5`3
+    SLR => 0x6`3
+    SAR => 0x7`3
+}
+
+#subruledef cond
+{
+    A => 0b00000
+    C => 0b00001
+    Z => 0b00010
+    G => 0b00100
+    E => 0b01000
+	{} => 0b00000
+}
+
+#ruledef
+{
+MOV r{dst_num}, r{src1_num}, {c:cond} => 0x0`3 @ src1_num`3 @ c`3 @ dst_num`3 @ 0x0
+LOAD r{dst_num}, r{src1_num}, {c:cond} => 0x0`3 @ src1_num`3 @ c`3 @ dst_num`3 @ 0x1
+MOV r{dst_num}, {value} => value`9 @ dst_num`3 @ 0x2
+STOR r{dst_num}, r{src1_num}, r{src2_num}, {c:cond} => src2_num`3 @ src1_num`3 @ c`3 @ 0x0`3 @ 0x3
+ALUA r{dst_num}, r{src1_num}, r{src2_num}, {m: math}  => src2_num`3 @ src1_num`3 @ m`3 @ 0x0`3 @ 0x4
+ALUL r{dst_num}, r{src1_num}, r{src2_num}, {l: logic}  => src2_num`3 @ src1_num`3 @ l`3 @ 0x0`3 @ 0x5
+LOADN r{dst_num}, {c:cond} => 0x0`6 @ c`3 @ dst_num`3 @ 0x6
+}
+
+#bank program
+
+start:
+MOV R6, 100
+MOV R5, 200
+ALUA r0, R5, R6, ADD
+MOV R7, start
